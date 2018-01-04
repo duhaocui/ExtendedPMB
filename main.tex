@@ -218,23 +218,29 @@ In the PMBM filter, each MB corresponds to a unique \textit{global hypothesis} f
 
 \subsection{Bernoulli RFS mixture reduction}
 \label{sec:bmr}
-Let $f_{\mathbb{H}}(\setX) = \sum_{h\in\mathbb{H}} w^{h} f^{h}(\setX)$ be a mixture of Bernoulli densities $f^{h}(\setX)$. The single Bernoulli density $\hat{f}(\setX)$ that minimizes the KL divergence
+Let $f_{\mathbb{H}}(\setX) = \sum_{h\in\mathbb{H}} w^{h} f^{h}(\setX)$ be a mixture of Bernoulli densities $f^{h}(\setX)$, where the existence-conditioned PDF of $f^{h}(\setX)$ is from a family of distributions $\mathcal{F}$, i.e., $f^{h}(\mathbf{x})\in\mathcal{F}, \forall h\in\mathbb{H}$. Suppose that we wish to approximate the Bernoulli mixture $f_{\mathbb{H}}(\setX)$ by a single Bernoulli density $\hat{f}(\setX)$, whose existence-conditioned PDF is from the the same family of distributions, i.e., $\hat{f}(\mathbf{x})\in\mathcal{F}$. The approximated Bernoulli density $\hat{f}(\setX)$ that minimizes the KL divergence
 \begin{align}
     D_{\text{KL}}(f_{\mathbb{H}}(\setX) || \hat{f}(\setX) ) = \int f_{\mathbb{H}}(\setX) \log\left( \frac{f_{\mathbb{H}}(\setX)}{\hat{f}(\setX)} \right) \delta \setX,
+    \label{eq:klmr}
 \end{align}
-has parameters \cite{pmbmpoint}
+has parameters \cite{pmbmpoint}:
 \begin{subequations}
 \begin{align}
-    \hat{r} = & \sum_{h\in\mathbb{H}} w^{h}r^{h} \\
-    \hat{f}(\sx) = & \underset{f}{\arg\min}~D_{\text{KL}} \left(  \sum_{h\in\mathbb{H}} w^{h} r^{h} f^{h}(\sx)  || f(\sx) \right). \label{eq:StateDensityKLdivMinimisation}
+    \hat{r} = & \sum_{h\in\mathbb{H}} w^{h}r^{h}, \label{eq:epmr}\\
+    \hat{f}(\sx) = & \underset{f\in\mathcal{F}}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{h\in\mathbb{H}} w^{h} r^{h} f^{h}(\sx)  || f(\sx) \bigg). \label{eq:StateDensityKLdivMinimisation}
 \end{align}
-\label{eq:approximatedBernoulli}
+\label{eq:approximatedBernoulli}%
 \end{subequations}
-In MTT, the state densities $f^{h}(\sx)$ are generally from the exponential family of distributions, e.g., the Gaussian distribution; in this case, the KL divergence minimization \eqref{eq:StateDensityKLdivMinimisation} has an analytical solution \cite{ ArdeshiriGOO:2015},
-\begin{equation}
-    \hat{f}(\mathbf{x})\propto\sum_{h\in\mathbb{H}} w^{h} r^{h} f^{h}(\sx),
-\end{equation}
-where the proportionality denotes that the mixture weights $w^{h}r^{h}$ need to be renormalized.
+For distributions from the exponential family, the KL divergence minimization \eqref{eq:StateDensityKLdivMinimisation} can be analytically solved by matching the expected sufficient statistics, see, e.g.,  \cite[Section 10.7]{Bishop:2006}, \cite{ArdeshiriGOO:2015}. 
+
+% For instance, if $f_{\mathbb{H}}(\setX)$ is a Gaussian mixture and $\hat{f}(\setX)$ is a Gaussian, then we can minimize the KL divergence (\ref{eq:klmr}) by moment matching.
+
+% In MTT, the state densities $f^{h}(\sx)$ are generally from the exponential family of distributions, e.g., the Gaussian distribution; in this case, the KL divergence minimization \eqref{eq:StateDensityKLdivMinimisation} has an analytical solution \cite{ ArdeshiriGOO:2015},
+% \begin{equation}
+%     \hat{f}(\mathbf{x})\propto\sum_{h\in\mathbb{H}} w^{h} r^{h} f^{h}(\sx),
+%     \label{eq:epdensitymr}
+% \end{equation}
+% where the proportionality denotes that the mixture weights $w^{h}r^{h}$ need to be renormalized.
 
 \subsection{Decomposition of KL divergence}
 \label{section:kldecomposition}
@@ -251,15 +257,14 @@ that minimizes the KL divergence
     \underset{g}{\arg\min}~D_{\text{KL}}(f(\mathbf{X})||g(\mathbf{X})).
     \label{eq:originalkl}
 \end{equation}
-
-Following a similar process to \cite[Section III.A]{variational}, the objective in (\ref{eq:originalkl}) has an upper bound that, when minimizing over $g^o(\cdot)$ and $g^n(\cdot)$, allows for the KL divergence minimization (\ref{eq:originalkl}) to be broken down into two separate KL divergence minimization problems:
+It is shown in \cite[Theorem 1]{recycle} that, the objective in (\ref{eq:originalkl}) has an upper bound that, when minimizing over $g^o(\cdot)$ and $g^n(\cdot)$, allows for the KL divergence minimization (\ref{eq:originalkl}) to be broken down into two separate KL divergence minimization problems:
 \begin{subequations}
 \begin{align}
     & \underset{g^o}{\arg\min}~D\bigg( \sum_{j\in\mathbb{J}} \mathcal{W}_j f^{j,o} (\setX^o)) || g^o(\setX^o) \bigg), \\
     & \underset{g^n}{\arg\min}~D\bigg( \sum_{{j\in\mathbb{J}}} \mathcal{W}_j f^{j,n} (\setX^n) || g^n(\setX^n)  \bigg).
 \end{align}
 \end{subequations}
-The proof has been omitted due to page length constraints. 
+% The proof has been omitted due to page length constraints. 
 
 
 % Given a mixture of Bernoullis $\sum_{h\in\mathbb{H}}w^hf^h(\mathbf{X}^h)$, the single Bernoulli $\hat{f}(\mathbf{X})$ that best matches the Bernoulli mixture can be obtained by minimizing the KL divergence
@@ -332,7 +337,7 @@ where $\hat{f}_{k|k}(\mathbf{X}_k)$ is restricted to a PMB. Because analytically
 %     \underset{g}{\arg\min}~D_{\text{KL}}\bigg(\sum_{j\in\mathbb{J}}\mathcal{W}^jf_{k|k}^j(\mathbf{X}_k^d)||\hat{f}_{k|k}(\mathbf{X}_k)\bigg).
 %     \label{eq:mbmtopmb}
 % \end{equation}
-Note that the PPP describing the set of undetected targets does not have to be approximated in order to obtain a PMB posterior (e.g., see \cite{recycle}). Thus, it is sufficient to consider approximating the MBM describing the set of detected targets as a PMB. The problem of approximating the MBM as a PMB is solved in two steps. First, we consider methods for approximating the MBM as a single MB. Second, we utilize the recycling method, proposed in \cite{recycle}, to further approximate the approximated MB as a PMB. However, analytically finding the MB density $g_{k|k}(\mathbf{X}_k^d)$ that minimizes the KL divergence
+Note that the PPP describing the set of undetected targets does not have to be approximated \cite{pmbmpoint}, and that Bernoulli tracks can be approximated as being Poisson \cite{recycle}. Thus, it is sufficient to consider approximating the MBM describing the set of detected targets as a PMB. The problem of approximating the MBM as a PMB is solved in two steps. First, we consider methods for approximating the MBM as a single MB. Second, we utilize the recycling method, proposed in \cite{recycle}, to further approximate the approximated MB as a PMB. However, analytically finding the MB density $g_{k|k}(\mathbf{X}_k^d)$ that minimizes the KL divergence
 \begin{equation}
     \underset{g}{\arg\min}~D_{\text{KL}}\bigg(\sum_{j\in\mathbb{J}}\mathcal{W}^jf_{k|k}^j(\mathbf{X}_k^d)||g_{k|k}(\mathbf{X}_k^d)\bigg).
     \label{eq:mbmtomb}
@@ -562,7 +567,7 @@ that best matches the MBM $f(\mathbf{X})$ with parameters (\ref{eq:mbmparameter}
 
 There are three major challenges related to this MB approximation. The first challenge is to determine the number of Bernoullis $|\hat{\mathbb{I}}|$ in the approximated MB, since different MB $f^j(\mathbf{X})$ may not all contain the same number of Bernoullis $|\mathbb{I}^j|$. Given $|\mathbb{M}|$ measurements, there are $2^{|\mathbb{M}|}-1$ possible ways in which we can form a subset of measurements. Each such subset can, in an association, be associated to a newly detected target. As a result, different global hypotheses may contain a different number of new tracks. Therefore, determining how many new tracks should be formed in the extended target PMB filter is a challenge. 
 
-In this work, we choose to approximate the MBM as a single MB by merging. Then, the second challenge is to determine, for each $\iota \in \hat{\mathbb{I}}$, which Bernoullis $f^{j,i}(\mathbf{X})$ should be used to form $\hat{r}^{\iota}$ and $g^{\iota}(\mathbf{x})$. The Bernoullis in each MB are unordered\footnote{Note that the indexing of Bernoullis in each MB is merely used for notational convenience.} so determining how to select Bernoullis to merge across different MBs is a challenge\footnote{In this work, we choose not to merge Bernoullis within the same MB. An MB corresponds to a collection of independent potential targets. It is generally inappropriate to represent two or more independent targets with a single Bernoulli.}. Alternative solutions to address the first and the second challenges are discussed in Section V and VI.
+In this work, we choose to approximate the MBM as a single MB by merging. Then, the second challenge is to determine, for each $\iota \in \hat{\mathbb{I}}$, which Bernoullis $f^{j,i}(\mathbf{X})$ should be used to form $\hat{r}^{\iota}$ and $g^{\iota}(\mathbf{x})$. The Bernoullis in each MB are unordered\footnote{Note that the indexing of Bernoullis in each MB is merely used for notational convenience.}, so determining how to select Bernoullis to merge across different MBs is a challenge\footnote{In this work, we choose not to merge Bernoullis within the same MB. An MB corresponds to a collection of independent potential targets. It is generally inappropriate to represent two or more independent targets with a single Bernoulli.}. Alternative solutions to address the first and the second challenges are discussed in Section V and VI.
 
 % Once we have decided the number of Bernoullis $|\hat{\mathbb{I}}|$ in the approximated MB, and the selection of Bernoullis from the MBM to merge for each approximated Bernoulli $g^{\iota}(\mathbf{X}^{\iota})$, 
 The last challenge is to determine how to merge the selected Bernoullis into a single Bernoulli. Compared to the first two challenges, the third challenge is relatively less difficult, e.g., given a Bernoulli mixture, one can simply take the weighted sum of different parameters. In extended target tracking, the merging of different target state densities is typically addressed by analytically minimizing the KL divergence \cite{phdextended,gammareduction}. In Section VII, we will discuss some implementation details regarding the merging of different Bernoullis under a common extended target model, called gamma Gaussian inverse Wishart (GGIW) \cite{phdextended,cphdextended}. 
@@ -636,19 +641,34 @@ In this section, we seek to develop a well performing PMB filter by adapting the
 % Another strategy, which is analogous to the TOMB/P filter, is to create a track collecting all single target hypotheses updating the same target (existing or potential). In what follows, we discuss the so-called extended target TO-PMB filter, its connection to the LMB filter and the drawback of this track-oriented merging approach.
 
 \subsection{Track formation}
-Let us discuss the formations of new tracks and pre-existing tracks separately. For pre-existing tracks ($\iota\in\hat{\mathbb{I}}\cap\mathbb{I}$), the approximated Bernoulli is simply formed by merging all Bernoullis that correspond to the same track in global hypotheses:
+Let us discuss the formations of new tracks and pre-existing tracks separately. For pre-existing tracks ($\iota\in\hat{\mathbb{I}}\cap\mathbb{I}$), the approximated Bernoulli $g^{\iota}(\mathbf{X}^{\iota})$ is simply formed by merging all Bernoullis that correspond to the same track in global hypotheses:
 \begin{equation}
-    g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\mathfrak{L}(\iota)}(\mathbf{X}^{\mathfrak{L}(\iota)}), \iota\in\hat{\mathbb{I}}\cap\mathbb{I},
+    \underset{g}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\mathfrak{L}(\iota)}(\mathbf{X}^{\mathfrak{L}(\iota)}) ||g^{\iota}(\mathbf{X}^{\iota}) \bigg),
+    % \iota\in\hat{\mathbb{I}}\cap\mathbb{I},
+    % g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\mathfrak{L}(\iota)}(\mathbf{X}^{\mathfrak{L}(\iota)}), \iota\in\hat{\mathbb{I}}\cap\mathbb{I},
     \label{eq:tomerge}
 \end{equation}
-where $\mathfrak{L}(\iota)=i$ is a bijection that maps the index $i\in\mathbb{I}^j\cap\mathbb{I}$ to the index $\iota\in\hat{\mathbb{I}}\cap\mathbb{I}$; $f^{j,i}(\mathbf{X}^i)$ has existence probability and existence-conditioned PDF in the form of (\ref{eq:missUpdate}) or (\ref{eq:measUpdate}); $g^{\iota}(\mathbf{X}^{\iota})$ is in the form of (\ref{eq:approximatedBernoulli}); the proportionality denotes that normalization is required to ensure that the weights of different $f^{j,i}(\mathbf{x})$, i.e., $\mathcal{W}^jr^{j,i}$, sum to one (e.g., see \cite{ArdeshiriGOO:2015}).
+% \begin{subequations}
+% \begin{align}
+%     \hat{r}^{\iota} &= \sum_{j\in\mathbb{J}}\mathcal{W}^jr^{j,\mathfrak{L}(\iota)},\\
+%     g^{\iota}(\mathbf{x}) &\propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\mathfrak{L}(\iota)}(\mathbf{x}).
+% \end{align}
+% \label{eq:tomerge}
+% \end{subequations}
+where $\mathfrak{L}(\iota)=i$ is a bijection that maps the index $i\in\mathbb{I}^j\cap\mathbb{I}$ to the index $\iota\in\hat{\mathbb{I}}\cap\mathbb{I}$; $f^{j,i}(\mathbf{X}^i)$ has existence probability and existence-conditioned PDF in the form of (\ref{eq:missUpdate}) or (\ref{eq:measUpdate}); $g^{\iota}(\mathbf{X}^{\iota})$ has existence probability and existence-conditioned PDF in the form of (\ref{eq:epmr}) and (\ref{eq:StateDensityKLdivMinimisation})\footnote{The same holds for (\ref{eq:tonew}), (\ref{eq:mstepjason}), (\ref{eq:mstepop}) and (\ref{eq:approxnewtrack})}.
+
+% \footnote{The same hold for (\ref{eq:tonew}), (\ref{eq:mstepjason}), (\ref{eq:mstepop}) and (\ref{eq:approxnewtrack})}
+
+% (\ref{eq:approximatedBernoulli}); the proportionality denotes that normalization is required to ensure that the weights of different $f^{j,i}(\mathbf{x})$, i.e., $\mathcal{W}^jr^{j,i}$, sum to one (e.g., see \cite{ArdeshiriGOO:2015}).
 % \footnote{The same also holds for (\ref{eq:tonew}), (\ref{eq:mstepjason}), (\ref{eq:mstepop}) and (\ref{eq:approxnewtrack}).}
 
 The number of new tracks is determined by the number of different measurement cells associated to the background in different global hypotheses. Let $\mathcal{C}$ denote the set of measurement cells $\mathbf{C}$ that are associated to a newly detected target in any of the global hypotheses $\mathbb{J}$, and let $f^{\mathbf{C}}(\cdot)$ denote the corresponding Bernoulli density, see (\ref{eq:newUpdate}). In the TO-PMB filter, each measurement cell $\mathbf{C}\in\mathcal{C}$ results in a unique Bernoulli in the approximated MB $g(\mathbf{X})$, thus the number of new tracks formed in the TO-PMB filter is the number of cells in $\mathcal{C}$, i.e., $|\hat{\mathbb{I}}\setminus\mathbb{I}|=|\mathcal{C}|$. 
 % Let $\mathbb{P}$ denote the set of all the possible non-empty subsets of measurement indices set $\mathbb{M}$, and let $\mathbf{C}_P$ denote the measurement cell formed by measurements with indices $P\in\mathbb{P}$. We assume that the subsets $P$ are indexed from 1 to $|\mathbb{P}|$, and the $\rho$th element is denoted as $P^{\rho}$. Further, if measurement cell $\mathbf{C}_{P^{\rho}}$ is hypothesised to be the detection of a potential new target, let $f^{\mathbf{C}_{P^{\rho}}}(\cdot)$ denote the Bernoulli density of the corresponding single target hypothesis. 
 Further, we define a bijection $\mathfrak{F}(\iota)=\mathbf{C}$ that maps the index of a new track $\iota\in\hat{\mathbb{I}}\setminus\mathbb{I}$ to the measurement cell $\mathbf{C}\in\mathcal{C}$. For new tracks ($\iota\in\hat{\mathbb{I}}\setminus\mathbb{I}$), the approximated Bernoulli is formed by merging single target hypotheses updated by the same measurement cell across different global hypotheses, according to
 \begin{equation}
-    g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{\mathfrak{F}(\iota)}(\mathbf{X})\Delta_{\mathfrak{F}(\iota)\in\mathcal{P}^j}, \iota\in\hat{\mathbb{I}}\setminus\mathbb{I},
+   \underset{g}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{\mathfrak{F}(\iota)}(\mathbf{X}^{\mathfrak{F}(\iota)})\Delta_{\mathfrak{F}(\iota)\in\mathcal{P}^j} ||g^{\iota}(\mathbf{X}^{\iota}) \bigg),
+%   \iota\in\hat{\mathbb{I}}\setminus\mathbb{I},
+    % g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{\mathfrak{F}(\iota)}(\mathbf{X}^{\mathfrak{F}(\iota)})\Delta_{\mathfrak{F}(\iota)\in\mathcal{P}^j}, \iota\in\hat{\mathbb{I}}\setminus\mathbb{I},
     \label{eq:tonew}
 \end{equation}
 where $\mathcal{P}^j$ denotes the partition of measurements assigned to potential new targets in the $j$th global hypothesis, and $\Delta_{\mathbf{C}\in\mathcal{P}^j}$ is an indicator function, which is equal to one if and only if measurement cell $\mathbf{C}$ belongs to measurement partition $\mathcal{P}^j$.
@@ -817,7 +837,7 @@ D_{\text{UB}}(f(\mathbf{X})||g(\mathbf{X}))= -\sum_{j\in\mathbb{J},\pi\in\Pi^j_N
 \end{multline}
 where $N$ denotes the number of Bernoullis that correspond to pre-existing tracks in each MB of $f(\mathbf{X})$ and the approximated MB $g(\mathbf{X})$, i.e., $N=|\hat{\mathbb{I}}\cap\mathbb{I}|$; $\Pi^j_N$ is the set of all ways to assign the Bernoullis $f^{j,i}(\mathbf{X}^i), i\in\mathbb{I}^j\cap\mathbb{I}, j\in\mathbb{J}$ to the Bernoullis $g^{\iota}(\mathbf{X}^{\iota}), \iota\in\hat{\mathbb{I}}\cap\mathbb{I}$; the missing data $q^j(\pi^j)$ is constrained to vary only with the $j$th MB, and satisfies $q^j(\pi^j)\geq0$ and  $\sum_{\pi^j\in\Pi^j_N} q^j(\pi^j) = 1$. The standard method for optimizing (\ref{eq:vaorigin}) is block coordinate descent, which alternates between minimization with respect to $g^{\iota}(\mathbf{X}^{\iota})$ (M-step) and $q_j(\pi^j)$ (E-step) \cite{variational}.
 
-Because solving the minimization problem (\ref{eq:vaorigin}) suffers from combinatorial complexity, approximation is needed to obtain a tractable solution. Here, two different approximation methods, and their limitations to extended target filtering, are studied.
+Because solving the minimization problem (\ref{eq:vaorigin}) suffers from combinatorial complexity, approximation is needed to obtain a tractable solution. Here, two different approximation methods are studied.
 
 \subsubsection{Efficient approximation of feasible set}
 
@@ -826,7 +846,7 @@ Because the minimization problem of (\ref{eq:vaorigin}) involves missing data $q
 \operatornamewithlimits{argmin}_{q(h,\iota)\in\mathcal{M}}-\sum_{\iota\in\hat{\mathbb{I}}\cap\mathbb{I}}\int\bigg(\sum_{h\in\mathbb{H}}q(h,\iota)f^h(\mathbf{X})\bigg)\log g^{\iota}(\mathbf{X})\delta\mathbf{X},
 \label{eq:feasibleset}
 \end{equation}
-where $\mathbb{H}$ is the index set of single target hypotheses included in the global hypotheses indexed by $j\in\mathbb{J}$, $q(h,\iota)$ is a simplified representation of $q^j(\pi^j)$, which specifies the weight of single target hypothesis density $f^h(\mathbf{X}^h)$\footnote{The same single target hypothesis may be included in different global hypotheses, thus it satisfies that $|\mathbb{H}|\leq\sum_{j\in\mathbb{J}}|\mathbb{I}^j|$. We use the single superscript $h$ to denote the index of single target hypothesis density in order to distinguish from the double superscript $\{j,i\}$, which denotes the indices of Bernoullis in the MBM.} in the new Bernoulli component $g^{\iota}(\mathbf{X}^{\iota})$, and the feasible set $\mathcal{M}$ is an approximation needed for tractability
+where $\mathbb{H}$ is the index set of single target hypotheses included in the global hypotheses indexed by $j\in\mathbb{J}$, $q(h,\iota)$ is a simplified representation of $q^j(\pi^j)$, which specifies the weight of single target hypothesis density $f^h(\mathbf{X}^h)$\footnote{The same single target hypothesis may be included in different global hypotheses, thus it satisfies that $|\mathbb{H}|\leq\sum_{j\in\mathbb{J}}|\mathbb{I}^j|$. We use the single superscript $h$ to denote the index of single target hypothesis density in order to distinguish from the double superscript $\{j,i\}$, which denotes the indices of Bernoullis in the MBM.} in the new Bernoulli component $g^{\iota}(\mathbf{X}^{\iota})$, and the feasible set $\mathcal{M}$ is an approximation needed for tractability \cite{variational}
 \begin{multline}
     \mathcal{M} = \Bigg\{q(h,\iota)\geq0\Bigg|\sum_{h\in\mathcal{H}}q(h,\iota)=1 ~\forall~ \iota\in\hat{\mathbb{I}\cap\mathbb{I}},\\\sum_{\iota\in\hat{\mathbb{I}}\cap\mathbb{I}}q(h,\iota)=p_h ~\forall~ h\in\mathbb{H}\Bigg\}.
     \label{eq:polytope}
@@ -846,7 +866,8 @@ The constraint $p_h$ satisfies $p_h=\sum_{\iota\in\hat{\mathbb{I}}\cap\mathbb{I}
 % \end{subequations}
 Note that here the missing data distribution is no longer constrained to vary only with the global hypotheses. In this case, each approximated Bernoulli can be expressed as the weighted sum of different single target hypothesis densities, and the M-step becomes
 \begin{equation}
-g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{h\in\mathbb{H}}q(h,\iota)f^h(\mathbf{X}^h), \iota\in\hat{\mathbb{I}}\cap\mathbb{I},
+\underset{g}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{h\in\mathbb{H}}q(h,\iota)f^h(\mathbf{X}^h) ||g^{\iota}(\mathbf{X}^{\iota}) \bigg),
+% g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{h\in\mathbb{H}}q(h,\iota)f^h(\mathbf{X}^h), \iota\in\hat{\mathbb{I}}\cap\mathbb{I},
 \label{eq:mstepjason}
 \end{equation}
 while the E-step reverts to:
@@ -875,7 +896,7 @@ The variational MB algorithm based on efficient approximation of feasible missin
 
 \subsubsection{Most likely assignment}
 
-The number of MBs in the MBM can be kept at a tractable level after truncating the global hypotheses with negligible weights. This allows us to study an alternative approach to solving the minimization problem of (\ref{eq:vaorigin}), following a similar approach to the Kullback-Leibler SJPDA (KLSJPDA) \cite{sjpda}. The KLSJPDA filter seeks to find the ordered distribution in the same unordered family, such that the new density can be most accurately approximated with a Gaussian density, in the KL sense. In the JPDA filter, the number of targets is assumed to be known, and the joint state of multiple targets are represented as a vector. As a comparison, given that each global hypothesis consists of the same number of pre-existing tracks, the multi-target RFS density will also have fixed cardinality. The similarities between the KLSJPDA filter and the variational MB filter were further explored in \cite{variational}.
+The number of MBs in the MBM can be kept at a tractable level after truncating the global hypotheses with negligible weights. This allows us to study an alternative approach to solving the minimization problem of (\ref{eq:vaorigin}), following a similar approach to the Kullback-Leibler SJPDA (KLSJPDA) \cite{sjpda}. The KLSJPDA filter seeks to find the ordered distribution in the same unordered family, such that the new density can be most accurately approximated with a Gaussian density, in the KL sense. In the JPDA filter, the number of targets is assumed to be known, and the joint state of multiple targets are represented as a vector. As a comparison, given that each global hypothesis consists of the same number of pre-existing tracks, the multi-target RFS density also has fixed cardinality. The similarities between the KLSJPDA filter and the variational MB filter are further explored in \cite{variational}.
 
 Let us go back to the approximated upper bound (\ref{eq:vaorigin}) that we want to minimize. Suppose that Bernoullis in different MBs are indexed by the same superscript $i$ if they correspond to single target hypotheses updating the same track, and that only Bernoullis with the same superscript $i$ can be merged. Because the approximate MB density is invariant to the indexing of the Bernoullis it contains, the selection of the assignment mapping $\pi$ in each MB will not change the MBM $f(\mathbf{X})$, but only will determine which Bernoullis are going to be merged. The minimization problem can be interpreted as the Bernoullis in each MB are permuted in such a manner that the upper bound (\ref{eq:vaorigin}) is minimized but the density of the reordered $f(\mathbf{X})$ remains unchanged. 
 
@@ -886,7 +907,8 @@ Empirically, we found that finding a set of most likely assignments for each MB 
 \end{equation}
 where the most likely assignment $\hat{\pi}^j$ can be obtained using methods such as the auction algorithm \cite{auction}. The minimization of (\ref{eq:vaorigin}) with respect to the approximated MB $g(\mathbf{X})$ simplifies to 
 \begin{equation}
-    g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\hat{\pi}^j(\mathfrak{L}(\iota))}(\mathbf{X}^{\hat{\pi}^j(\mathfrak{L}(\iota))}), \iota\in\hat{\mathbb{I}\cap\mathbb{I}}.
+\underset{g}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\hat{\pi}^j(\mathfrak{L}(\iota))}(\mathbf{X}^{\hat{\pi}^j(\mathfrak{L}(\iota))}) ||g^{\iota}(\mathbf{X}^{\iota}) \bigg).
+    % g^{\iota}(\mathbf{X}^{\iota}) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^jf^{j,\hat{\pi}^j(\mathfrak{L}(\iota))}(\mathbf{X}^{\hat{\pi}^j(\mathfrak{L}(\iota))}), \iota\in\hat{\mathbb{I}\cap\mathbb{I}}.
 \label{eq:mstepop}
 \end{equation}
 This means that each approximated Bernoulli in $g(\mathbf{X})$ can be obtained by merging Bernoullis in $f(\mathbf{X})$ with the same assignment mapping. 
@@ -1150,16 +1172,17 @@ We illustrate how the assignment mapping in each MB changes in each iteration of
 
 We present a greedy method to form new tracks in a reasonable and efficient way. The pseudo code of this merging approach is given in Table \ref{pmbnewtracks}. The intuition behind this proposed method is that we want to merge highly dependent Bernoullis across different MBs so that similar new tracks will not be formed in the same local region and new tracks with significant different Bernoulli densities will not be merged.
 
-In this merging approach, we only merge Bernoullis in different MBs that are considered similar enough. For any pair of Bernoulli densities, the symmetrised KL divergence is used to measure the similarity \cite{ArdeshiriGOO:2015}, defined as
+In this merging approach, we only merge Bernoullis in different MBs that are considered similar enough. For any pair of Bernoulli densities, the symmetrised KL divergence is used to measure the similarity, defined as
 \begin{equation}
     D_{\text{SKL}}(p||q) = D_{\text{KL}}(p||q) + D_{\text{KL}}(q||p). 
 \end{equation}
 
 To start with, the MB densities are sorted in the descending order of their weights, so that $f^1(\mathbf{X})$ has the highest weight. Remember that reordering the MBs will not change the MBM process. Then, we cluster Bernoullis that satisfy the merging criteria into the same group. As a result, the number of new tracks formed is equal to the number of Bernoulli clusters. Lastly, new tracks are formed by only merging Bernoullis within the same group. For the $\iota$th ($\iota\in\hat{\mathbb{I}}\setminus\mathbb{I}$) new track in the approximated MB $g(\mathbf{X})$, its Bernoulli density can be expressed as
-\begin{equation}
-    g^{\iota}(\mathbf{X}^\iota) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^j\sum_{i\in\mathbb{I}^j\setminus\mathbb{I}}f^{j,i}(\mathbf{X})\Delta_{\{(j,i)\}\in\mathbb{L}^{\iota-|\mathbb{I}|}}, \iota\in\hat{\mathbb{I}}\setminus\mathbb{I},
+\begin{multline}
+\underset{g}{\arg\min}~D_{\text{KL}} \bigg(  \sum_{j\in\mathbb{J}}\mathcal{W}^j\\\times\sum_{i\in\mathbb{I}^j\setminus\mathbb{I}}f^{j,i}(\mathbf{X}^i)\Delta_{\{(j,i)\}\in\mathbb{L}^{\iota-|\mathbb{I}|}} ||g^{\iota}(\mathbf{X}^{\iota}) \bigg),
+    % g^{\iota}(\mathbf{X}^\iota) \propto \sum_{j\in\mathbb{J}}\mathcal{W}^j\sum_{i\in\mathbb{I}^j\setminus\mathbb{I}}f^{j,i}(\mathbf{X}^i)\Delta_{\{(j,i)\}\in\mathbb{L}^{\iota-|\mathbb{I}|}}, \iota\in\hat{\mathbb{I}}\setminus\mathbb{I},
     \label{eq:approxnewtrack}
-\end{equation}
+\end{multline}
 where set $\mathbb{L}^{\iota-|\mathbb{I}|}$ contains indices of Bernoullis that are within the same group. Empirical results show that the number of tracks formed using this approach can be kept to a relatively small number. We illustrate this with the following example. 
 
 \begin{example}
@@ -1207,7 +1230,7 @@ In this section, some implementation details of the PMB filter are presented. A 
 % There are several single extended target models available in the literature, see \cite{extendedoverview} for an overview. 
 
 \subsection{Single target models}
-In the GGIW model, it is assumed that the measurements are Gaussian distributed around the centroid of the target. The extended target state $\mathbf{x}_k$ is the combination of a random Poisson rate $\gamma_k$ modelling the average number of measurements generated by the target, a random vector $\xi_k$ describing the target kinematic state, and a random matrix $\chi_k$ describing the target size and shape, i.e., $\mathbf{x}_k=\{\xi_{k},\chi_{k},\gamma_{k}\}$.
+In the GGIW model, it is assumed that the measurements are Gaussian distributed around the centroid of the target. The extended target state $\mathbf{x}_k$ is the combination of a random Poisson rate $\gamma_k$ modelling the average number of measurements generated by the target, a random vector $\xi_k$ describing the target kinematic state, and a random matrix $\chi_k$ describing the target size and shape, i.e., $\mathbf{x}_k=\{\xi_{k},\chi_{k},\gamma_{k}\}$. 
 
 The motion models are given by
 \begin{subequations}
@@ -1235,8 +1258,9 @@ where $\zeta = \{a,b,m,P,v,V\}$ is the set of GGIW density parameters. If we hav
 The GGIW implementations regarding the prediction and update of PPP and Bernoulli components are not presented due to page limits. The reader is referred to \cite{pmbmextended,pmbmextended2} for more details. In this subsection, we present the GGIW implementations regarding the block coordinate descent used to merge the MBM representing pre-existing tracks. The time index is omitted for simplicity.
 
 \subsubsection{E-step}
-In order to solve the optimization problems (\ref{eq:esteplp}) and (\ref{eq:estepoptimal}) of the E-step, the cross entropy between two Bernoulli-GGIW distributions needs to be calculated. Since the gamma distributions, the Gaussian distributions and the inverse Wishart distributions are mutually independent, a tractable solution can be analytically derived. Corresponding mathematical expressions are not presented here due to page limits. 
-% See Appendix \ref{appendix:crossentropy} for details.
+In order to solve the optimization problems (\ref{eq:esteplp}) and (\ref{eq:estepoptimal}) of the E-step, the cross entropy between two Bernoulli-GGIW distributions needs to be calculated. Since the gamma distributions, the Gaussian distributions and the inverse Wishart distributions are mutually independent, a tractable solution can be analytically derived \cite{phdextended,gammareduction}. See Appendix \ref{appendix:crossentropy} for details.
+
+% Corresponding mathematical expressions are not presented here due to page limits. 
 
 \subsubsection{M-step}
 Given a Bernoulli-GGIW mixture, the existence probability of the approximated Bernoulli is a weighted sum of the existence probabilities of each Bernoulli. Suppose that we have a number of Bernoullis indexed by $n\in\mathbb{N}$, each of which has existence probability $r^n$ and GGIW density $\mathcal{GGIW}(\mathbf{x}^n;\zeta^n)$. The existence probability of the approximated Bernoulli can be
@@ -1267,7 +1291,7 @@ A simple strategy to handle this problem is to use a criterion for deciding whic
 where threshold $\tau$ determines which GGIW components are going to be merged. 
 In this case, the existence-conditioned PDF of the approximated MB can be obtained by
 \begin{multline}
-\underset{\mathcal{GGIW}(\hat{\mathbf{x}};\hat{\zeta})}{\arg\min}D_{\text{KL}}\bigg(\sum_{\substack{n\in\mathbb{N}:\\D_{\text{KL}}(\mathcal{GGIW}(\mathbf{x}^{n^*};\zeta^{n^*})\\||\mathcal{GGIW}(\mathbf{x}^n;\zeta^n)) < \tau}}w^n\\\times\mathcal{GGIW}(\mathbf{x}^n;\zeta^n)\big|\big|\mathcal{GGIW}(\hat{\mathbf{x}};\hat{\zeta})\bigg).
+\underset{\mathcal{GGIW}(\hat{\mathbf{x}};\hat{\zeta})}{\arg\min}D_{\text{KL}}\Bigg(\sum_{\substack{n\in\mathbb{N}:\\D_{\text{KL}}(\mathcal{GGIW}(\mathbf{x}^{n^*};\zeta^{n^*})\\||\mathcal{GGIW}(\mathbf{x}^n;\zeta^n)) < \tau}}w^n\\\times\mathcal{GGIW}(\mathbf{x}^n;\zeta^n)\big|\big|\mathcal{GGIW}(\hat{\mathbf{x}};\hat{\zeta})\Bigg).
 \end{multline}
 
 % At this point, we have figured out how to address the third challenge that we outlined in Section \ref{section:challenge}, i.e., the merging of a selection of Bernoullis under a GGIW model. 
@@ -1437,7 +1461,7 @@ This paper has proposed a tractable and efficient extended target filtering algo
 % where $N$ denotes the number of Bernoulli components in each MB of $f(\mathbf{X})$ and the approximated MB $g(\mathbf{X})$; $\Pi^j_N$ is the set of all ways to assign the Bernoulli components in the $j$th MB $f^j(\mathbf{X})$ to the Bernoulli components in $g(\mathbf{X})$; the missing data $q^j(\pi^j)$ is constrained to vary only with the $j$th MB, and it satisfies $q^j(\pi^j)\geq0$ and  $\sum_{\pi^j\in\Pi^j_N} q^j(\pi^j) = 1$. The standard method for solving the form of (\ref{eq:vaorigin}) is by block coordinate descent, which alternates between minimisation with respect to $g^i(\mathbf{X})$ (M-step) and $q_j(\pi^j)$ (E-step) \cite{variational}. Because solving the above problem suffers from combinatorial complexity, approximation is needed to obtain a tractable solution.
 
 
-% \appendices
+\appendices
 % \section{Proof of Theorem \ref{theorem1}}
 % \label{appendix:proof}
 % In this appendix, we prove Theorem \ref{theorem1}. To simplify notation, the time index will be removed. The minimization problem of (\ref{eq:joingMBkl}) can be reformulated as
@@ -1466,38 +1490,38 @@ This paper has proposed a tractable and efficient extended target filtering algo
 % \end{align}
 % This proves Theorem \ref{theorem1}.
 
-% \section{Cross Entropy between Two Bernoulli-GGIWs}
-% \label{appendix:crossentropy}
-% Suppose $f^h(\mathbf{X})$ and $g^i(\mathbf{X})$ are two Bernoulli process with the following form
-% \begin{subequations}
-% \begin{align}
-%     f^{h}(\mathbf{X}) &= \begin{cases}
-%         1 - r^{h} & \mathbf{X} = \emptyset,\\
-%         r^{h}\mathcal{GGIW}(\mathbf{x}^{h};\zeta^{h}) & \mathbf{X} = \{\mathbf{x}\},
-%     \end{cases}\\
-%     g^{i}(\mathbf{X}) &= \begin{cases}
-%         1 - r^{i} & \mathbf{X} = \emptyset,\\
-%         r^{i}\mathcal{GGIW}(\mathbf{x}^{i};\zeta^{i}) & \mathbf{X} = \{\mathbf{x}\}.
-%     \end{cases}
-% \end{align}
-% \end{subequations}
-% The cross entropy between $f^h(\mathbf{X})$ and $g^i(\mathbf{X})$ can be expressed as:
-% \begin{multline}
-%     -\int f^{h}(\mathbf{X})\log g^{i}(\mathbf{X})\delta\mathbf{X} = -(1-r^{h})\log(1-r^i) \\- r^{h}\log r^i - r^{h}\bigg(\int\mathcal{N}(\xi^{h};m^{h},P^{h})\log\mathcal{N}(\xi^i;m^i,\hat{P}^i)d\mathbf{x} \\+ \int\mathcal{GAM}(\gamma^{h};a^{h},b^{h})\log\mathcal{GAM}(\gamma^i;a^i,b^i)d\mathbf{x} \\+ \int\mathcal{IW}(\chi^{h};v^{h},V^{h})\log\mathcal{IW}(\chi^i;v^i,V^i)\delta\mathbf{x} \bigg),
-% \end{multline}
-% where
-% \begin{subequations}
-% \begin{multline}
-%     \int\mathcal{N}(\xi^{h};m^{h},P^{h})\log\mathcal{N}(\xi^i;m^i,P^i)d\mathbf{x} =\\ -\frac{d}{2}\log(2\pi)-\frac{1}{2}\log|P^i|\\-\frac{1}{2}\text{Tr}\bigg(\big(P^{h}+(m^{h}-m^i)(m^{h}-m^i)^T\big)\big(P^i\big)^{-1}\bigg),
-%     \end{multline}
-%     \begin{multline}
-%         \int\mathcal{GAM}(\gamma^{h};a^{h},b^{h})\log\mathcal{GAM}(\gamma^i;a^i,b^i)d\mathbf{x} = a^i\log b^i \\- \log\Gamma(a^i) + (a^i-1)(\psi_0(a^{h})-\log b^{h}) - b^i\frac{a^{h}}{b^{h}},
-%     \end{multline}
-%     % \text{and}
-%     \begin{multline}
-%         \int\mathcal{IW}(\chi^{h};v^{h},V^{h})\log\mathcal{IW}(\chi^i;v^i,V^i)d\mathbf{x} =\\ -\frac{(v^i-d-1)d}{2}\log2 + \frac{v^i-d-1}{2}\log|V^i| \\- \log\Gamma_d\bigg(\frac{v^i-d-1}{2}\bigg) - \frac{v^i}{2}\bigg(\log|V^{h}|-d\log2\\-\sum_{j=1}^d\psi_0\bigg(\frac{v^{h}-d-j}{2}\bigg)\bigg) -\frac{1}{2}\text{Tr}\big((v^{h}-d-1)(V^{h})^{-1}V^i\big).
-%     \end{multline}
-% \end{subequations}
+\section{Cross Entropy between Two Bernoulli-GGIWs}
+\label{appendix:crossentropy}
+Suppose $f^h(\mathbf{X})$ and $g^i(\mathbf{X})$ are two Bernoulli process with the following form
+\begin{subequations}
+\begin{align}
+    f^{h}(\mathbf{X}) &= \begin{cases}
+        1 - r^{h} & \mathbf{X} = \emptyset,\\
+        r^{h}\mathcal{GGIW}(\mathbf{x}^{h};\zeta^{h}) & \mathbf{X} = \{\mathbf{x}\},
+    \end{cases}\\
+    g^{i}(\mathbf{X}) &= \begin{cases}
+        1 - r^{i} & \mathbf{X} = \emptyset,\\
+        r^{i}\mathcal{GGIW}(\mathbf{x}^{i};\zeta^{i}) & \mathbf{X} = \{\mathbf{x}\}.
+    \end{cases}
+\end{align}
+\end{subequations}
+The cross entropy between $f^h(\mathbf{X})$ and $g^i(\mathbf{X})$ can be expressed as:
+\begin{multline}
+    -\int f^{h}(\mathbf{X})\log g^{i}(\mathbf{X})\delta\mathbf{X} = -(1-r^{h})\log(1-r^i) \\- r^{h}\log r^i - r^{h}\bigg(\int\mathcal{N}(\xi^{h};m^{h},P^{h})\log\mathcal{N}(\xi^i;m^i,\hat{P}^i)d\mathbf{x} \\+ \int\mathcal{GAM}(\gamma^{h};a^{h},b^{h})\log\mathcal{GAM}(\gamma^i;a^i,b^i)d\mathbf{x} \\+ \int\mathcal{IW}(\chi^{h};v^{h},V^{h})\log\mathcal{IW}(\chi^i;v^i,V^i)d\mathbf{x} \bigg),
+\end{multline}
+where
+\begin{subequations}
+\begin{multline}
+    \int\mathcal{N}(\xi^{h};m^{h},P^{h})\log\mathcal{N}(\xi^i;m^i,P^i)d\mathbf{x} =\\ -\frac{d}{2}\log(2\pi)-\frac{1}{2}\log|P^i|\\-\frac{1}{2}\text{Tr}\bigg(\big(P^{h}+(m^{h}-m^i)(m^{h}-m^i)^T\big)\big(P^i\big)^{-1}\bigg),
+    \end{multline}
+    \begin{multline}
+        \int\mathcal{GAM}(\gamma^{h};a^{h},b^{h})\log\mathcal{GAM}(\gamma^i;a^i,b^i)d\mathbf{x} = a^i\log b^i \\- \log\Gamma(a^i) + (a^i-1)(\psi_0(a^{h})-\log b^{h}) - b^i\frac{a^{h}}{b^{h}},
+    \end{multline}
+    \text{and}
+    \begin{multline}
+        \int\mathcal{IW}(\chi^{h};v^{h},V^{h})\log\mathcal{IW}(\chi^i;v^i,V^i)d\mathbf{x} =\\ -\frac{(v^i-d-1)d}{2}\log2 + \frac{v^i-d-1}{2}\log|V^i| \\- \log\Gamma_d\bigg(\frac{v^i-d-1}{2}\bigg) - \frac{v^i}{2}\bigg(\log|V^{h}|-d\log2\\-\sum_{j=1}^d\psi_0\bigg(\frac{v^{h}-d-j}{2}\bigg)\bigg) -\frac{1}{2}\text{Tr}\big((v^{h}-d-1)(V^{h})^{-1}V^i\big).
+    \end{multline}
+\end{subequations}
 
 
 \bibliographystyle{IEEEtran}
